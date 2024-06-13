@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
-module Main (main) where
+module Main (main, main2) where
 
 import Data.Maybe (fromJust)
 import Data.Text qualified as Text
@@ -13,7 +13,11 @@ import Unison.Syntax.HashQualified' qualified as HQ' (unsafeParseText)
 import Unison.Syntax.Lexer
 
 main :: IO ()
-main =
+main = do
+  debugFileLex "../scratch.u"
+
+main2 :: IO ()
+main2 = do
   withCP65001 (run test)
 
 test :: Test ()

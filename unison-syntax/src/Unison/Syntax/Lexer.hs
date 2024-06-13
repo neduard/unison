@@ -258,7 +258,7 @@ showErrorFancy = \case
 
 lexer0' :: String -> String -> [Token Lexeme]
 lexer0' scope rem =
-  case flip S.evalState env0 $ P.runParserT lexemes scope rem of
+  case flip S.evalState env0 $ P.runParserT  lexemes (traceShow ("scope" :: String, scope) scope) (traceShow ("rem" :: String, rem) rem) of
     Left e ->
       let errsWithSourcePos =
             fst $
@@ -809,13 +809,13 @@ lexemes' eof =
         section :: P [Token Lexeme]
         section = wrap "syntax.docSection" $ do
           n <- S.gets parentSection
-          hashes <- P.try $ lit (replicate n '#') *> P.takeWhile1P Nothing (== '#') <* sp
+          hashes <- P.try $ lit (replicate (traceShow ("n" :: String, n) n) '#') *> P.takeWhile1P Nothing (== '#') <* sp
           title <- paragraph <* CP.space
-          let m = length hashes + n
+          let m = length (traceShow ("hashes" :: String, hashes) hashes) + n
           body <-
-            local (\env -> env {parentSection = m}) $
+            local (\env -> env {parentSection = (traceShow ("m" :: String, m) m)}) $
               P.many (sectionElem <* CP.space)
-          pure $ title <> join body
+          pure $ (traceShow ("title" :: String, title, "n" :: String, n) title) <> join (traceShow ("body" :: String, body) body)
 
         wrap :: String -> P [Token Lexeme] -> P [Token Lexeme]
         wrap o p = do
