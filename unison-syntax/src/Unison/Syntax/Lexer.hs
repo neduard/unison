@@ -71,9 +71,10 @@ type BlockName = String
 type Layout = [(BlockName, Column)]
 
 data ParsingEnv = ParsingEnv
-  { layout :: !Layout, -- layout stack
+  { layout :: Layout, -- layout stack
     opening :: Maybe BlockName, -- `Just b` if a block of type `b` is being opened
     inLayout :: Bool, -- are we inside a construct that uses layout?
+    parentSections :: [Int], -- 1 means we are inside a # Heading 1
     parentSection :: Int, -- 1 means we are inside a # Heading 1
     parentListColumn :: Int -- 4 means we are inside a list starting at the fourth column
   }
@@ -303,7 +304,7 @@ lexer0' scope rem =
       (P.EndOfInput) -> "end of input"
     customErrs es = [Err <$> e | P.ErrorCustom e <- toList es]
     toPos (P.SourcePos _ line col) = Pos (P.unPos line) (P.unPos col)
-    env0 = ParsingEnv [] (Just scope) True 0 0
+    env0 = ParsingEnv [] (Just scope) True [0] 0 0
     -- hacky postprocessing pass to do some cleanup of stuff that's annoying to
     -- fix without adding more state to the lexer:
     --   - 1+1 lexes as [1, +1], convert this to [1, +, 1]
@@ -424,7 +425,7 @@ lexemes' eof =
       let openTok = Token (Open "syntax.docUntitledSection") openStart openEnd
       env0 <- S.get
       -- Disable layout while parsing the doc block
-      (bodyToks0, closeTok) <- local (\env -> env {inLayout = False}) do
+      (bodyToks0, closeTok) <- local (\env -> env {inLayout = False, parentSections = 0 : (parentSections env0)}) do
         bodyToks <- body
         closeStart <- posP
         lit "}}"
@@ -476,7 +477,7 @@ lexemes' eof =
                     <|> void docOpen
                     <|> void (P.satisfy isSpace)
                     <|> void closing
-          word <- P.manyTill (P.satisfy (\ch -> not (isSpace ch))) end
+          word <- P.manyTill (P.satisfy (not . isSpace)) end
           guard (not $ reserved word || null word)
           pure word
 
@@ -641,7 +642,7 @@ lexemes' eof =
               CP.space
                 *> local
                   (\env -> env {inLayout = True, opening = Just "docEval"})
-                  (restoreStack "docEval" $ lexemes' ([] <$ lit fence))
+                  (restoreStack "docEval" $ lexemes' ([] <$ lit (traceShow ("fence" :: String, fence) fence)))
 
             exampleBlock = wrap "syntax.docExampleBlock" $ do
               void $ lit "@typecheck" <* CP.space
@@ -655,7 +656,7 @@ lexemes' eof =
                   skip col s@('\t' : _) | col < tabWidth = s
                   skip col ('\t' : r) = skip (col - tabWidth) r
                   skip col (c : r)
-                    | isSpace c && (not $ isControl c) =
+                    | isSpace c && not (isControl c) =
                         skip (col - 1) r
                   skip _ s = s
                in List.intercalate "\n" $ skip column <$> lines s
@@ -770,13 +771,13 @@ lexemes' eof =
                     *> do
                       col2 <- column <$> posP
                       guard $ col2 >= col
-                      (P.notFollowedBy $ numberedStart <|> bulletedStart)
+                      P.notFollowedBy $ numberedStart <|> bulletedStart
               pure ()
 
         numberedItem = P.label msg $ do
           (col, s) <- numberedStart
           pure s
-            <+> ( wrap "syntax.docColumn" $ do
+            <+> wrap "syntax.docColumn" ( do
                     p <- nonNewlineSpaces *> listItemParagraph
                     subList <-
                       local (\e -> e {parentListColumn = col}) (P.optional $ listSep *> list)
@@ -808,12 +809,12 @@ lexemes' eof =
         -- # A section title (not a subsection)
         section :: P [Token Lexeme]
         section = wrap "syntax.docSection" $ do
-          n <- S.gets parentSection
-          hashes <- P.try $ lit (replicate (traceShow ("n" :: String, n) n) '#') *> P.takeWhile1P Nothing (== '#') <* sp
+          n <- S.gets parentSections
+          hashes <- P.try $ lit (replicate (traceShow ("n" :: String, n) (head n)) '#') *> P.takeWhile1P Nothing (== '#') <* sp
           title <- paragraph <* CP.space
-          let m = length (traceShow ("hashes" :: String, hashes) hashes) + n
+          let m = length (traceShow ("hashes" :: String, hashes) hashes) + (head n)
           body <-
-            local (\env -> env {parentSection = (traceShow ("m" :: String, m) m)}) $
+            local (\env -> env {parentSections = (traceShow ("m" :: String, m) (m : (tail n)))}) $
               P.many (sectionElem <* CP.space)
           pure $ (traceShow ("title" :: String, title, "n" :: String, n) title) <> join (traceShow ("body" :: String, body) body)
 
@@ -1444,7 +1445,7 @@ debugLex'' [Token (Err (UnexpectedTokens msg)) start end] =
   where
     msg1 = "Error on line " <> show (line start) <> ", column " <> show (column start)
     msg2 =
-      "Error on line "
+      "Error on lines "
         <> show (line start)
         <> ", column "
         <> show (column start)
