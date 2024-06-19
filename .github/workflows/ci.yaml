@@ -70,8 +70,12 @@ jobs:
       matrix:
         os:
           # While iterating on this file, you can disable one or more of these to speed things up
+          - ubuntu-latest
           - ubuntu-20.04
+          - macos-latest
+          - macOS-13
           - macOS-12
+          - windows-latest
           - windows-2019
           # - windows-2022
     steps:
@@ -214,8 +218,12 @@ jobs:
       matrix:
         os:
           # While iterating on this file, you can disable one or more of these to speed things up
+          - ubuntu-latest
           - ubuntu-20.04
+          - macos-latest
+          - macOS-13
           - macOS-12
+          - windows-latest
           - windows-2019
           # - windows-2022
     steps:
@@ -285,7 +293,10 @@ jobs:
       matrix:
         os:
           # While iterating on this file, you can disable one or more of these to speed things up
+          - ubuntu-latest
           - ubuntu-20.04
+          - macos-latest
+          - macOS-13
           - macOS-12
           # - windows-2019
           # - windows-2022
