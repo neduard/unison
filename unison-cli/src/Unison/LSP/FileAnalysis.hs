@@ -35,6 +35,7 @@ import Unison.KindInference.Error qualified as KindInference
 import Unison.LSP.Conversions
 import Unison.LSP.Conversions qualified as Cv
 import Unison.LSP.Diagnostics (DiagnosticSeverity (..), mkDiagnostic, reportDiagnostics)
+import Unison.LSP.FileAnalysis.UnusedBindings qualified as UnusedBindings
 import Unison.LSP.Orphans ()
 import Unison.LSP.Types
 import Unison.LSP.VFS qualified as VFS
@@ -77,7 +78,7 @@ import Witherable
 -- | Lex, parse, and typecheck a file.
 checkFile :: (HasUri d Uri) => d -> Lsp (Maybe FileAnalysis)
 checkFile doc = runMaybeT do
-  currentPath <- lift getCurrentPath
+  pp <- lift getCurrentProjectPath
   let fileUri = doc ^. uri
   (fileVersion, contents) <- VFS.getFileContents fileUri
   parseNames <- lift getCurrentNames
@@ -90,7 +91,7 @@ checkFile doc = runMaybeT do
   let parsingEnv =
         Parser.ParsingEnv
           { uniqueNames = uniqueName,
-            uniqueTypeGuid = Cli.loadUniqueTypeGuid currentPath,
+            uniqueTypeGuid = Cli.loadUniqueTypeGuid pp,
             names = parseNames
           }
   (notes, parsedFile, typecheckedFile) <- do
@@ -111,12 +112,13 @@ checkFile doc = runMaybeT do
           & toRangeMap
   let typeSignatureHints = fromMaybe mempty (mkTypeSignatureHints <$> parsedFile <*> typecheckedFile)
   let fileSummary = FileSummary.mkFileSummary parsedFile typecheckedFile
+  let unusedBindingDiagnostics = fileSummary ^.. _Just . to termsBySymbol . folded . folding (\(topLevelAnn, _refId, trm, _type) -> UnusedBindings.analyseTerm fileUri topLevelAnn trm)
   let tokenMap = getTokenMap tokens
   conflictWarningDiagnostics <-
     fold <$> for fileSummary \fs ->
       lift $ computeConflictWarningDiagnostics fileUri fs
   let diagnosticRanges =
-        (errDiagnostics <> conflictWarningDiagnostics)
+        (errDiagnostics <> conflictWarningDiagnostics <> unusedBindingDiagnostics)
           & fmap (\d -> (d ^. range, d))
           & toRangeMap
   let fileAnalysis = FileAnalysis {diagnostics = diagnosticRanges, codeActions = codeActionRanges, fileSummary, typeSignatureHints, ..}
