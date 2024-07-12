@@ -84,7 +84,6 @@ import System.Directory (canonicalizePath, doesFileExist)
 import System.Environment (getExecutablePath)
 import System.FilePath ((</>))
 import System.FilePath qualified as FilePath
-import System.Random.MWC (createSystemRandom)
 import U.Codebase.Branch qualified as V2
 import U.Codebase.Causal qualified as Causal
 import U.Codebase.HashTags (CausalHash)
