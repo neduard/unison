@@ -403,7 +403,7 @@ jobs:
         if: steps.cache-generated-source.outputs.cache-hit != 'true'
         run: |
           mkdir -p ${{ env.jit_generated_src_scheme }}
-          ${{ env.ucm }} transcript ${{ runner.temp }}/setup-jit.md
+          ${{ env.ucm }} transcript.fork ${{ runner.temp }}/setup-jit.md
 
       - name: bundle source
         run: |
