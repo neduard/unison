@@ -13,9 +13,6 @@ dependencies:
   - file-embed
   - template-haskell
 
-ghc-options:
-  -Wall
-
 default-extensions:
   - ApplicativeDo
   - BlockArguments

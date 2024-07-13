@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.2.
+-- This file has been generated from package.yaml by hpack version 0.36.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -50,7 +50,6 @@ library
       TypeApplications
       TypeFamilies
       ViewPatterns
-  ghc-options: -Wall
   build-depends:
       base
     , basement
@@ -102,7 +101,6 @@ test-suite util-bytes-tests
       TypeApplications
       TypeFamilies
       ViewPatterns
-  ghc-options: -Wall
   build-depends:
       base
     , basement

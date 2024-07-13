@@ -25,7 +25,7 @@ default-extensions:
   - TypeApplications
   - ViewPatterns
 
-ghc-options: -Wall -O0 -fno-warn-name-shadowing -fno-warn-missing-pattern-synonym-signatures
+ghc-options: -Wall -Werror -fno-warn-name-shadowing -fno-warn-missing-pattern-synonym-signatures
 
 flags:
   optimized:

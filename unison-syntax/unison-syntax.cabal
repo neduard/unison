@@ -62,7 +62,6 @@ library
       TypeApplications
       TypeFamilies
       ViewPatterns
-  ghc-options: -Wall
   build-depends:
       base
     , bytes
@@ -118,7 +117,6 @@ test-suite syntax-tests
       TypeApplications
       TypeFamilies
       ViewPatterns
-  ghc-options: -Wall
   build-depends:
       base
     , bytes

@@ -16,9 +16,6 @@ dependencies:
   - unison-prelude
   - text
 
-ghc-options:
-  -Wall
-
 default-extensions:
   - ApplicativeDo
   - BangPatterns

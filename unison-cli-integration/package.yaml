@@ -7,8 +7,6 @@ flags:
     manual: true
     default: false
 
-ghc-options: -Wall
-
 executables:
   cli-integration-tests:
     when:
@@ -16,7 +14,7 @@ executables:
         other-modules: Paths_unison_cli_integration
     source-dirs: integration-tests
     main: Suite.hs
-    ghc-options: -W -threaded -rtsopts "-with-rtsopts=-N -T" -v0
+    ghc-options: -Wall -Werror -W -threaded -rtsopts "-with-rtsopts=-N -T" -v0
     dependencies:
       - base
       - code-page

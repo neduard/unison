@@ -31,9 +31,6 @@ dependencies:
   - witch
   - witherable
 
-ghc-options:
-  -Wall
-
 default-extensions:
   - ApplicativeDo
   - BangPatterns
