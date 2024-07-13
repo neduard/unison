@@ -373,13 +373,14 @@ instance MEM 'UN where
       fsz = bytes $ sp - fp
   {-# INLINE grab #-}
 
-  ensure stki@(US ap fp sp stk) sze
-    | sze <= 0 || bytes (sp + sze + 1) < ssz = pure stki
-    | otherwise = do
+  ensure stki@(US ap fp sp stk) sze = do
+    ssz <- getSizeofMutableByteArray stk
+    if sze <= 0 || bytes (sp + sze + 1) < ssz
+      then pure stki
+      else do
         stk' <- resizeMutableByteArray stk (ssz + ext)
         pure $ US ap fp sp stk'
     where
-      ssz = sizeofMutableByteArray stk
       ext
         | bytes sze > 10240 = bytes sze + 4096
         | otherwise = 10240
@@ -393,11 +394,12 @@ instance MEM 'UN where
 
   duplicate (US ap fp sp stk) =
     US ap fp sp <$> do
+      sz <- getSizeofMutableByteArray stk
       b <- newByteArray sz
       copyMutableByteArray b 0 stk 0 sz
       pure b
     where
-      sz = sizeofMutableByteArray stk
+
   {-# INLINE duplicate #-}
 
   discardFrame (US ap fp _ stk) = pure $ US ap fp fp stk
