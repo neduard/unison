@@ -48,9 +48,6 @@ dependencies:
   - unliftio
   - unliftio-core
 
-ghc-options:
-  -Wall
-
 default-extensions:
   - BangPatterns
   - BlockArguments

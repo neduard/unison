@@ -23,9 +23,6 @@ dependencies:
   - unison-prelude
   - unordered-containers
 
-ghc-options:
-  -Wall
-
 default-extensions:
   - BlockArguments
   - ConstraintKinds

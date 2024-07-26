@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.2.
+-- This file has been generated from package.yaml by hpack version 0.36.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -45,7 +45,7 @@ library
       TupleSections
       TypeApplications
       ViewPatterns
-  ghc-options: -Wall -fno-warn-orphans
+  ghc-options: -Wall -Werror -fno-warn-orphans
   build-depends:
       base
     , network-uri

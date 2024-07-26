@@ -17,6 +17,7 @@ dependencies:
 
 ghc-options:
   -Wall
+  -Werror
   -fno-warn-orphans
 
 default-extensions:

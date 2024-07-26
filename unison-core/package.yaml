@@ -7,7 +7,7 @@ library:
     - condition: false
       other-modules: Paths_unison_core1
   source-dirs: src
-  ghc-options: -Wall -fno-warn-name-shadowing -fno-warn-missing-pattern-synonym-signatures -funbox-strict-fields
+  ghc-options: -Wall -Werror -fno-warn-name-shadowing -fno-warn-missing-pattern-synonym-signatures -funbox-strict-fields
   dependencies:
     - base
     - bytestring

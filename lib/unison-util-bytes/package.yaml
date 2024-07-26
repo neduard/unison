@@ -2,8 +2,6 @@ name: unison-util-bytes
 github: unisonweb/unison
 copyright: Copyright (C) 2013-2022 Unison Computing, PBC and contributors
 
-ghc-options: -Wall
-
 dependencies:
   - base
   - basement

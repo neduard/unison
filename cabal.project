@@ -54,6 +54,10 @@ constraints:
   optparse-applicative == 0.18.1.0,
   tls == 1.8.0
 
+allow-newer:
+  numerals:text,
+  numerals:containers
+
 -- For now there is no way to apply ghc-options for all local packages
 -- See https://cabal.readthedocs.io/en/latest/cabal-project.html#package-configuration-options
 package codebase

@@ -44,9 +44,6 @@ dependencies:
   - nonempty-containers
   - unison-prelude
 
-ghc-options:
-  -Wall
-
 default-extensions:
   - BangPatterns
   - BlockArguments

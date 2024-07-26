@@ -68,9 +68,6 @@ dependencies:
   - warp
   - yaml
 
-ghc-options:
-  -Wall
-
 default-extensions:
   - BlockArguments
   - ConstraintKinds
